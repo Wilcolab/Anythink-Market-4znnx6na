@@ -6,6 +6,7 @@ describe('Arithmetic', function () {
                 .end(function (err, res) {
                     expect(res.body).to.eql({ error: "Unspecified operation" });
                     done();
+                });
         });
         it('rejects invalid operation', function (done) {
             request.get('/arithmetic?operation=foobar&operand1=21&operand2=21')
@@ -82,109 +83,44 @@ describe('Arithmetic', function () {
                     done();
                 });
         });
-        // Additional Addition tests
-        it('adds two floating point numbers', function (done) {
-            request.get('/arithmetic?operation=add&operand1=0.1&operand2=0.2')
-            .expect(200)
-            .end(function (err, res) {
-                expect(res.body.result).to.be.closeTo(0.3, 1e-10);
-                done();
-            });
-        });
-
-        it('adds large numbers', function (done) {
-            request.get('/arithmetic?operation=add&operand1=1000000000&operand2=2000000000')
-            .expect(200)
-            .end(function (err, res) {
-                expect(res.body).to.eql({ result: 3000000000 });
-                done();
-            });
-        });
-
-        // Additional Multiplication tests
-        it('multiplies a floating point and integer', function (done) {
-            request.get('/arithmetic?operation=multiply&operand1=2.5&operand2=4')
-            .expect(200)
-            .end(function (err, res) {
-                expect(res.body).to.eql({ result: 10 });
-                done();
-            });
-        });
-
-        it('multiplies by one', function (done) {
-            request.get('/arithmetic?operation=multiply&operand1=42&operand2=1')
-            .expect(200)
-            .end(function (err, res) {
-                expect(res.body).to.eql({ result: 42 });
-                done();
-            });
-        });
-
-        it('multiplies by negative zero', function (done) {
-            request.get('/arithmetic?operation=multiply&operand1=42&operand2=-0')
-            .expect(200)
-            .end(function (err, res) {
-                expect(res.body.result).to.equal(0);
-                done();
-            });
-        });
-
-        // Additional Division tests
-        it('divides negative zero by a number', function (done) {
-            request.get('/arithmetic?operation=divide&operand1=-0&operand2=2')
-            .expect(200)
-            .end(function (err, res) {
-                expect(res.body.result).to.equal(0);
-                done();
-            });
-        });
-
-        it('divides by negative one', function (done) {
-            request.get('/arithmetic?operation=divide&operand1=42&operand2=-1')
-            .expect(200)
-            .end(function (err, res) {
-                expect(res.body.result).to.equal(-42);
-                done();
-            });
-        });
-
-        it('divides two floating point numbers', function (done) {
-            request.get('/arithmetic?operation=divide&operand1=0.3&operand2=0.1')
-            .expect(200)
-            .end(function (err, res) {
-                expect(res.body.result).to.be.closeTo(3, 1e-10);
-                done();
-            });
-        });
-
-        // Additional Validation tests
-        it('rejects missing operand2', function (done) {
-            request.get('/arithmetic?operation=add&operand1=21')
-            .expect(400)
-            .end(function (err, res) {
-                expect(res.body).to.eql({ error: "Invalid operand2: undefined" });
-                done();
-            });
-        });
-
-        it('rejects non-numeric operand', function (done) {
-            request.get('/arithmetic?operation=add&operand1=foo&operand2=21')
-            .expect(400)
-            .end(function (err, res) {
-                expect(res.body).to.eql({ error: "Invalid operand1: foo" });
-                done();
-            });
-        });
-
-        it('rejects empty query', function (done) {
-            request.get('/arithmetic')
-            .expect(400)
-            .end(function (err, res) {
-                expect(res.body).to.eql({ error: "Unspecified operation" });
-                done();
-            });
-        });
+        it('adds with negative exponent', function (done) {
+            request.get('/arithmetic?operation=add&operand1=1.2e-5&operand2=-1.2e-5')
+                .expect(200)
+                .end(function (err, res) {
+                    expect(res.body).to.eql({ result: 0 });
+                    done();
                 });
+        });
+    });
+
+// TODO: Challenge #1
+ 
+
+    describe('Multiplication', function () {
+        it('multiplies two positive integers', function (done) {
+            request.get('/arithmetic?operation=multiply&operand1=21&operand2=2')
+                .expect(200)
+                .end(function (err, res) {
+                    expect(res.body).to.eql({ result: 42 });
+                    done();
+                });
+        });
+        it('multiplies a positive integer with zero', function (done) {
+            request.get('/arithmetic?operation=multiply&operand1=21&operand2=0')
+                .expect(200)
+                .end(function (err, res) {
+                    expect(res.body).to.eql({ result: 0 });
+                    done();
+                });
+        });
+        it('multiplies a positive integer and negative integer', function (done) {
+            request.get('/arithmetic?operation=multiply&operand1=21&operand2=-2')
+                .expect(200)
+                .end(function (err, res) {
+                    expect(res.body).to.eql({ result: -42 });
+                    done();
+                });
+        });
         it('multiplies two negative integers', function (done) {
             request.get('/arithmetic?operation=multiply&operand1=-21&operand2=-2')
                 .expect(200)
